@@ -1,0 +1,313 @@
+{
+  "name": "Restaurant Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "restaurant",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -160
+      ],
+      "id": "cc01e3a5-b0de-4731-b0d3-3cbebdcaf86a",
+      "name": "Webhook",
+      "webhookId": "e811e3fa-4c4a-4ad6-bddb-1135cb7c871c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ff2d9d74-82cd-4ceb-b09e-e8daf2016270",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "reservation",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "96046376-3920-48a0-a0ad-881f96b5a0f2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90d18564-cd53-42d5-88a0-93d9793a3804",
+              "name": "message",
+              "value": "=Reservation confirmed for {{ $json.body.customer_name }} on {{ $json.body.date }} at {{ $json.body.time }} for {{ $json.body.party_size }} people. Booking #{{ $json.body.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8bdad40e-4915-4079-8973-b74c925fffa6",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -176
+      ],
+      "id": "68f3cdf3-5116-49b8-b547-5798165d5bc8",
+      "name": "reservation"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90d18564-cd53-42d5-88a0-93d9793a3804",
+              "name": "message",
+              "value": "=Reservation #{{ $json.body.id }} has been cancelled successfully.",
+              "type": "string"
+            },
+            {
+              "id": "1251c122-9d59-4ed2-a448-fedd39119531",
+              "name": "email",
+              "value": "={{$json.body.email}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "4569e8d7-3e1e-4d57-bedb-675eaf6deb91",
+      "name": "cancelation"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "reservation Conformation for Sunset Bistro",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "40dc23c1-6876-4953-835f-b316da98abc7",
+      "name": "Reservation mail",
+      "webhookId": "fb1cb68d-7682-4631-b3fc-9b23548d197e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "X5IuY3LoYCSe4tij",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "reservation Cancelsation for Sunset Bistro",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        16
+      ],
+      "id": "2f139b14-dfa4-47bd-8b10-9b7c43729724",
+      "name": "Reservation mail1",
+      "webhookId": "fb1cb68d-7682-4631-b3fc-9b23548d197e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "X5IuY3LoYCSe4tij",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "reservation mail sent successfully ! ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        -176
+      ],
+      "id": "67099946-080d-4224-b877-f81dec1c4c2f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "cancellation mail sent successfully ! ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        48
+      ],
+      "id": "fb0b306a-c21b-4b33-8368-22580e32a1f5",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:5678",
+            "user-agent": "python-requests/2.34.2",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept": "*/*",
+            "connection": "keep-alive",
+            "content-length": "142",
+            "content-type": "application/json"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "customer_name": "user",
+            "date": "Friday",
+            "time": "8pm",
+            "party_size": 5,
+            "email": "test@example.com",
+            "id": 1,
+            "event": "reservation"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/restaurant",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "reservation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cancelation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reservation": {
+      "main": [
+        [
+          {
+            "node": "Reservation mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancelation": {
+      "main": [
+        [
+          {
+            "node": "Reservation mail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reservation mail": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reservation mail1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1f4433c4-a4a8-4060-b1b4-d7f6d28a26d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9354ac03a8abe166390386c59fe8224d0dbc92e27c0e00cc067a2afdb9fd209"
+  },
+  "id": "gyQdZPvwrgGxYrVF",
+  "tags": []
+}
